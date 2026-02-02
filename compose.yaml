@@ -1,3 +1,4 @@
+
 services:
   zabbix:
     image: zabbix/zabbix-server-mysql
@@ -6,6 +7,7 @@ services:
     ports:
     - "10051:10051/tcp"
     - "162:162/udp"
+    - "10050:10050/tcp"
     depends_on:
       - zabbix-database
     environment:
@@ -26,6 +28,8 @@ services:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=admin
       - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306/tcp"
     volumes:
       - ./zabbix-db-data:/var/lib/mysql
 
@@ -41,7 +45,7 @@ services:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=admin
       - MYSQL_ROOT_PASSWORD=root
-      - ZBX_SERVER_HOST=zabbix-server
+      - ZBX_SERVER_HOST=zabbix
       - PHP_TZ=UTC
     depends_on:
       - zabbix-database
@@ -53,3 +57,17 @@ services:
     restart: unless-stopped
     ports:
     - "3000:3000/tcp"
+
+  debian-agent:
+    container_name: debian-agent
+    build: ./gerenciaveis/debian
+    image: gerenciaveis/debian:latest
+    ports:
+      - "161:161/udp"
+
+  ubuntu-agent:
+    container_name: ubuntu-agent
+    build: ./gerenciaveis/ubuntu
+    image: gerenciaveis/ubuntu:latest
+    ports:
+      - "1161:161/udp"
